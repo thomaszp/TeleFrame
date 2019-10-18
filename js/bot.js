@@ -93,10 +93,10 @@ var Bot = class {
     //Download incoming video
     this.bot.on("video", (ctx) => {
       if (
-        !(
-          this.whitelistChats.length > 0 &&
-          this.whitelistChats.indexOf(ctx.message.chat.id) !== -1
-        )
+          (
+              this.whitelistChats.length > 0 &&
+              this.whitelistChats.indexOf(ctx.message.chat.id) == -1
+          )
       ) {
         this.logger.info(
           "Whitelist triggered:",
