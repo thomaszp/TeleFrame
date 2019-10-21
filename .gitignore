@@ -65,9 +65,14 @@ config/config.js
 images/*
 !images/.gitkeep
 
+assets/*
+!assets/.gitkeep
+
 audiofiles/*
 !audiofiles/.gitkeep
 
 *.DS_Store
 
 .idea/
+
+config/config.js

@@ -9,8 +9,8 @@ var ImageWatchdog = class {
     this.emitter = emitter;
 
     //get paths of already downloaded images
-    if (fs.existsSync(this.imageFolder + '/' + "images.json")) {
-      fs.readFile(this.imageFolder + '/' + "images.json", (err, data) => {
+    if (fs.existsSync(this.imageFolder + '/' + "assets.json")) {
+      fs.readFile(this.imageFolder + '/' + "assets.json", (err, data) => {
         if (err) throw err;
         var jsonData = JSON.parse(data);
         for (var image in jsonData) {
@@ -55,7 +55,7 @@ var ImageWatchdog = class {
     var self = this;
     // stringify JSON Object
     var jsonContent = JSON.stringify(this.images);
-    fs.writeFile(this.imageFolder + '/' + "images.json", jsonContent, 'utf8', function(err) {
+    fs.writeFile(this.imageFolder + '/' + "assets.json", jsonContent, 'utf8', function(err) {
       if (err) {
         self.logger.error("An error occured while writing JSON Object to File.");
         return console.log(err);

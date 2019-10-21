@@ -39,7 +39,7 @@ function createWindow() {
 
   // create imageWatchdog and bot
   var imageWatchdog = new imagewatcher(
-    config.imageFolder,
+    config.assetFolder,
     config.imageCount,
     global.images,
     emitter,
@@ -48,7 +48,7 @@ function createWindow() {
 
   var bot = new telebot(
     config.botToken,
-    config.imageFolder,
+    config.assetFolder,
     imageWatchdog,
     config.showVideos,
     config.whitelistChats,

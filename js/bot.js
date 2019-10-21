@@ -40,6 +40,29 @@ var Bot = class {
     //Help message
     this.bot.help((ctx) => ctx.reply("Send me an image."));
 
+    //Download incoming text messages
+    this.bot.on("text", (ctx) => {
+      if (
+          (
+              this.whitelistChats.length > 0 &&
+              this.whitelistChats.indexOf(ctx.message.chat.id) == -1
+          )
+      ) {
+        this.logger.info(
+            "Whitelist triggered:",
+            ctx.message.chat.id,
+            this.whitelistChats,
+            this.whitelistChats.indexOf(ctx.message.chat.id)
+        );
+        ctx.reply(
+            "Hey there, this bot is whitelisted, pls add your chat id to the config file"
+        );
+        return;
+      }
+
+      this.logger.info(ctx.message.text);
+    });
+
     //Download incoming photo
     this.bot.on("photo", (ctx) => {
       if (
