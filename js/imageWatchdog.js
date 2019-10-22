@@ -22,7 +22,7 @@ var ImageWatchdog = class {
     }
   }
 
-  newImage(src, sender, caption, chatId, chatName, messageId) {
+  newAsset(src, sender, caption, chatId, chatName, messageId) {
     //handle new incoming image
     // TODO: message ID and chat name to reply to specific image and to show
     //         chat name for voice recording message
@@ -44,7 +44,7 @@ var ImageWatchdog = class {
 		} else {
 			type = 'image';
 		}
-    this.emitter.send('newImage', {
+    this.emitter.send('newAsset', {
       sender: sender,
 			type: type
     });

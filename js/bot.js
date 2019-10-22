@@ -61,6 +61,35 @@ var Bot = class {
       }
 
       this.logger.info(ctx.message.text);
+
+      this.telegram
+          .getFileLink(ctx.message.photo[ctx.message.photo.length - 1].file_id)
+          .then((link) => {
+            download
+                .image({
+                  url: link,
+                  dest: this.imageFolder + "/" + moment().format("x") + ".jpg"
+                })
+                .then(({ filename, image }) => {
+                  var chatName = ''
+                  if (ctx.message.chat.type == 'group') {
+                    chatName = ctx.message.chat.title;
+                  } else if (ctx.message.chat.type == 'private') {
+                    chatName = ctx.message.from.first_name;
+                  }
+                  this.newAsset(
+                      filename,
+                      ctx.message.from.first_name,
+                      ctx.message.caption,
+                      ctx.message.chat.id,
+                      chatName,
+                      ctx.message.message_id
+                  );
+                })
+                .catch((err) => {
+                  this.logger.error(err);
+                });
+          });
     });
 
     //Download incoming photo
@@ -98,7 +127,7 @@ var Bot = class {
               } else if (ctx.message.chat.type == 'private') {
                 chatName = ctx.message.from.first_name;
               }
-              this.newImage(
+              this.newAsset(
                 filename,
                 ctx.message.from.first_name,
                 ctx.message.caption,
@@ -147,7 +176,7 @@ var Bot = class {
               } else if (ctx.message.chat.type == 'private') {
                 chatName = ctx.message.from.first_name;
               }
-              this.newImage(
+              this.newAsset(
                 filename,
                 ctx.message.from.first_name,
                 ctx.message.caption,
@@ -187,9 +216,9 @@ var Bot = class {
     this.logger.info("Bot started!");
   }
 
-  newImage(src, sender, caption, chatId, chatName, messageId) {
+  newAsset(src, sender, caption, chatId, chatName, messageId) {
     //tell imageWatchdog that a new image arrived
-    this.imageWatchdog.newImage(src, sender, caption, chatId, chatName, messageId);
+    this.imageWatchdog.newAsset(src, sender, caption, chatId, chatName, messageId);
   }
 
   sendMessage(message) {

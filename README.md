@@ -74,7 +74,7 @@ The following properties can be configured:
 | `playSoundOnRecieve` | Play a sound on recieving a message, set `false` to turn off.                                                                                                        |
 | `showVideos`         | When set to true, videos that are send to the bot are also shown.                                                                                                    |
 | `playVideoAudio`     | If recieved videos should be played with sound or not.                                                                                                               |
-| `imageFolder`        | The folder where the images are stored.                                                                                                                              |
+| `assetFolder`        | The folder where the assets are stored.                                                                                                                              |
 | `fullscreen`         | When set to true, TeleFrame will run in fullscreen mode.                                                                                                             |
 | `fadeTime`           | The fading time between two images.                                                                                                                                  |
 | `interval`           | The time that an image is shown.                                                                                                                                     |

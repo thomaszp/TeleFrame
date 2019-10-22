@@ -36,9 +36,9 @@ $("body").on('touchend', function(event) {
   tapPos = event.originalEvent.changedTouches[0].pageX
   containerWidth = $("body").width()
   if (tapPos / containerWidth < 0.2) {
-    previousImage()
+    previousAsset()
   } else if (tapPos / containerWidth > 0.8) {
-    nextImage()
+    nextAsset()
   } else {
     if (longpress) {
       ipcRenderer.send("record", currentImageForVoiceReply['chatId'], currentImageForVoiceReply['messageId']);
@@ -111,9 +111,9 @@ ipcRenderer.on("recordError", function(event, arg) {
   });
 });
 
-// handle new incoming image
-ipcRenderer.on("newImage", function(event, arg) {
-  newImage(arg.sender, arg.type);
+// handle new incoming asset
+ipcRenderer.on("newAsset", function(event, arg) {
+  newAsset(arg.sender, arg.type);
   if (config.playSoundOnRecieve != false) {
     audio.play();
   }
@@ -121,11 +121,11 @@ ipcRenderer.on("newImage", function(event, arg) {
 
 // handle navigation
 ipcRenderer.on("next", function(event, arg) {
-  nextImage()
+  nextAsset()
 });
 
 ipcRenderer.on("previous", function(event, arg) {
-  previousImage()
+  previousAsset()
 });
 
 ipcRenderer.on("pause", function(event, arg) {
@@ -165,15 +165,15 @@ function hidePause() {
 }
 
 // functions for navigation
-function nextImage() {
+function nextAsset() {
   if (isPaused) hidePause();
-  loadImage(true, 0);
+  loadAsset(true, 0);
   if (isPaused) showPause();
 }
 
-function previousImage() {
+function previousAsset() {
   if (isPaused) hidePause();
-  loadImage(false, 0);
+  loadAsset(false, 0);
   if (isPaused) showPause();
 }
 
@@ -189,17 +189,29 @@ function play() {
   if (!isPaused) return;
 
   isPaused = false;
-  loadImage(true, 0);
+  loadAsset(true, 0);
   hidePause(isPaused);
 }
 
+function assetIsVideo(asset) {
+  return asset.src.split(".").pop() == "mp4"
+}
+
+function assetIsImage(asset) {
+  return asset.src.split(".").pop() == "jpg"
+}
+
+function assetIsText(asset) {
+  return asset.src.split(".").pop() == "txt"
+}
+
 //load image to slideshow
-function loadImage(isNext, fadeTime, goToLatest = false) {
+function loadAsset(isNext, fadeTime, goToLatest = false) {
   clearTimeout(currentTimeout);
 
   if (images.length == 0) {
     currentTimeout = setTimeout(() => {
-      loadImage(true, fadeTime);
+      loadAsset(true, fadeTime);
     }, config.interval);
     return;
   }
@@ -216,18 +228,21 @@ function loadImage(isNext, fadeTime, goToLatest = false) {
     if (currentImageIndex < 0) currentImageIndex = images.length - 1;
   }
 
-  var image = images[currentImageIndex];
+  var asset = images[currentImageIndex];
 
   //get current container and create needed elements
   var currentImage = container.firstElementChild;
   var div = document.createElement("div");
-  var img;
-  if (image.src.split(".").pop() == "mp4") {
-    img = document.createElement("video");
-    img.muted = !config.playVideoAudio;
-    img.autoplay = true;
-  } else {
-    img = document.createElement("img");
+  var assetTag;
+  if (assetIsVideo(asset)) {
+    assetTag = document.createElement("video");
+    assetTag.muted = !config.playVideoAudio;
+    assetTag.autoplay = true;
+  } else if (assetIsImage(asset)) {
+    assetTag = document.createElement("img");
+  } else if (assetIsText(asset)) {
+    assetTag = document.createElement("div")
+    assetTag.innerText = "Hello World";
   }
   var sender = document.createElement("span");
   var caption = document.createElement("span");
@@ -255,14 +270,14 @@ function loadImage(isNext, fadeTime, goToLatest = false) {
   }
 
   //set class names and style attributes
-  img.src = image.src;
-  img.className = "image";
-  div.className = "imgcontainer";
+  assetTag.src = asset.src;
+  assetTag.className = "image";
+  div.className = "assetcontainer";
   sender.className = "sender";
   caption.className = "caption";
   caption.id = "caption";
-  sender.innerHTML = image.sender;
-  caption.innerHTML = image.caption;
+  sender.innerHTML = asset.sender;
+  caption.innerHTML = asset.caption;
   sender.style.backgroundColor = backgroundColor;
   caption.style.backgroundColor = backgroundColor;
   sender.style.color = fontColor;
@@ -298,8 +313,8 @@ function loadImage(isNext, fadeTime, goToLatest = false) {
   //calculate aspect ratio to show complete image on the screen and
   //fade in new image while fading out the old image as soon as
   //the new imageis loaded
-  if (image.src.split(".").pop() == "mp4") {
-    img.onloadeddata = function() {
+  if (assetIsVideo(asset)) {
+    assetTag.onloadeddata = function() {
       screenAspectRatio =
         remote
         .getCurrentWindow()
@@ -309,12 +324,12 @@ function loadImage(isNext, fadeTime, goToLatest = false) {
         .getCurrentWindow()
         .webContents.getOwnerBrowserWindow()
         .getBounds().height;
-      imageAspectRatio = img.naturalWidth / img.naturalHeight;
+      imageAspectRatio = assetTag.naturalWidth / assetTag.naturalHeight;
       if (imageAspectRatio > screenAspectRatio) {
-        img.style.width = "100%";
+        assetTag.style.width = "100%";
         div.style.width = "100%";
       } else {
-        img.style.height = "100%";
+        assetTag.style.height = "100%";
         div.style.height = "100%";
       }
       $(div).velocity("fadeIn", {
@@ -325,12 +340,12 @@ function loadImage(isNext, fadeTime, goToLatest = false) {
       });
       if (!isPaused) {
         currentTimeout = setTimeout(() => {
-          loadImage(true, fadeTime);
-        }, img.duration * 1000);
+          loadAsset(true, fadeTime);
+        }, assetTag.duration * 1000);
       }
     };
-  } else {
-    img.onload = function() {
+  } else if (assetIsImage(asset)) {
+    assetTag.onload = function() {
       screenAspectRatio =
         remote
         .getCurrentWindow()
@@ -340,12 +355,12 @@ function loadImage(isNext, fadeTime, goToLatest = false) {
         .getCurrentWindow()
         .webContents.getOwnerBrowserWindow()
         .getBounds().height;
-      imageAspectRatio = img.naturalWidth / img.naturalHeight;
+      imageAspectRatio = assetTag.naturalWidth / assetTag.naturalHeight;
       if (imageAspectRatio > screenAspectRatio) {
-        img.style.width = "100%";
+        assetTag.style.width = "100%";
         div.style.width = "100%";
       } else {
-        img.style.height = "100%";
+        assetTag.style.height = "100%";
         div.style.height = "100%";
       }
       $(div).velocity("fadeIn", {
@@ -356,17 +371,31 @@ function loadImage(isNext, fadeTime, goToLatest = false) {
       });
       if (!isPaused) {
         currentTimeout = setTimeout(() => {
-          loadImage(true, config.fadeTime);
+          loadAsset(true, config.fadeTime);
         }, config.interval);
       }
     };
+  } else if (assetIsText(asset)) {
+    assetTag.style.width = "100%";
+    div.style.width = "100%";
+    $(div).velocity("fadeIn", {
+      duration: fadeTime
+    });
+    $(currentImage).velocity("fadeOut", {
+      duration: fadeTime
+    });
+    if (!isPaused) {
+      currentTimeout = setTimeout(() => {
+        loadAsset(true, config.fadeTime);
+      }, config.interval);
+    }
   }
 
-  div.appendChild(img);
+  div.appendChild(assetTag);
   if (config.showSender) {
     div.appendChild(sender);
   }
-  if (config.showCaption && image.caption !== undefined) {
+  if (config.showCaption && asset.caption !== undefined) {
     div.appendChild(caption);
   }
   setTimeout(function() {
@@ -387,7 +416,7 @@ function loadImage(isNext, fadeTime, goToLatest = false) {
 }
 
 //notify user of incoming image and restart slideshow with the newest image
-function newImage(sender, type) {
+function newAsset(sender, type) {
   images = remote.getGlobal("images");
   if (type == "image") {
     Swal.fire({
@@ -397,7 +426,7 @@ function newImage(sender, type) {
       type: "success"
     }).then((value) => {
       currentImageIndex = images.length;
-      loadImage(true, 0);
+      loadAsset(true, 0);
     });
   } else if (type == "video") {
     Swal.fire({
@@ -407,10 +436,10 @@ function newImage(sender, type) {
       type: "success"
     }).then((value) => {
       currentImageIndex = images.length;
-      loadImage(true, 0);
+      loadAsset(true, 0);
     });
   }
 }
 
 //start slideshow of images
-loadImage(true, config.fadeTime);
+loadAsset(true, config.fadeTime);

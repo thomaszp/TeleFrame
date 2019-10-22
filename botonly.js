@@ -36,7 +36,7 @@ var ImageWatchdog = class {
     }
   }
 
-  newImage(src, sender, caption) {
+  newAsset(src, sender, caption) {
     //handle new incoming image
     this.images.unshift({
       'src': src,
