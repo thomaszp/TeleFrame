@@ -9,8 +9,8 @@ const fs = require(`fs`);
 var Bot = class {
   constructor(
     botToken,
-    imageFolder,
-    imageWatchdog,
+    assetFolder,
+    assetWatchdog,
     showVideo,
     whitelistChats,
     voiceReply,
@@ -20,8 +20,8 @@ var Bot = class {
     this.bot = new Telegraf(botToken);
     this.telegram = new Telegram(botToken);
     this.logger = logger;
-    this.imageFolder = imageFolder;
-    this.imageWatchdog = imageWatchdog;
+    this.assetFolder = assetFolder;
+    this.assetWatchdog = assetWatchdog;
     this.showVideo = showVideo;
     this.whitelistChats = whitelistChats;
     this.voiceReply = voiceReply;
@@ -68,7 +68,7 @@ var Bot = class {
             download
                 .image({
                   url: link,
-                  dest: this.imageFolder + "/" + moment().format("x") + ".jpg"
+                  dest: this.assetFolder + "/" + moment().format("x") + ".jpg"
                 })
                 .then(({ filename, image }) => {
                   var chatName = ''
@@ -118,7 +118,7 @@ var Bot = class {
           download
             .image({
               url: link,
-              dest: this.imageFolder + "/" + moment().format("x") + ".jpg"
+              dest: this.assetFolder + "/" + moment().format("x") + ".jpg"
             })
             .then(({ filename, image }) => {
               var chatName = ''
@@ -167,7 +167,7 @@ var Bot = class {
           download
             .image({
               url: link,
-              dest: this.imageFolder + "/" + moment().format("x") + ".mp4"
+              dest: this.assetFolder + "/" + moment().format("x") + ".mp4"
             })
             .then(({ filename, image }) => {
               var chatName = ''
@@ -217,8 +217,8 @@ var Bot = class {
   }
 
   newAsset(src, sender, caption, chatId, chatName, messageId) {
-    //tell imageWatchdog that a new image arrived
-    this.imageWatchdog.newAsset(src, sender, caption, chatId, chatName, messageId);
+    //tell assetWatchdog that a new asset arrived
+    this.assetWatchdog.newAsset(src, sender, caption, chatId, chatName, messageId);
   }
 
   sendMessage(message) {

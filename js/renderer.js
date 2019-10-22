@@ -13,10 +13,10 @@ const config = remote.getGlobal("config");
 logger.info("Renderer started ...");
 
 // Create variables
-var images = remote.getGlobal("images");
+var assets = remote.getGlobal("assets");
 var container = document.getElementById("container");
 var isPaused = false;
-var currentImageIndex = images.length;
+var currentAssetIndex = assets.length;
 var startTime, endTime, longpress, timeout, recordSwal, currentChatId, currentMessageId, currentTimeout;
 
 // configure sound notification sound
@@ -27,7 +27,7 @@ if (config.playSoundOnRecieve != false) {
 // handle touch events for navigation and voice reply
 $("body").on('touchstart', function() {
   startTime = new Date().getTime();
-  currentImageForVoiceReply = images[currentImageIndex]
+  currentImageForVoiceReply = assets[currentAssetIndex]
 });
 
 $("body").on('touchend', function(event) {
@@ -54,7 +54,7 @@ $("body").on('touchend', function(event) {
 
 // handle pressed record button
 ipcRenderer.on("recordButtonPressed", function(event, arg) {
-  currentImageForVoiceReply = images[currentImageIndex]
+  currentImageForVoiceReply = assets[currentAssetIndex]
   ipcRenderer.send("record", currentImageForVoiceReply['chatId'], currentImageForVoiceReply['messageId']);
 });
 
@@ -209,26 +209,26 @@ function assetIsText(asset) {
 function loadAsset(isNext, fadeTime, goToLatest = false) {
   clearTimeout(currentTimeout);
 
-  if (images.length == 0) {
+  if (assets.length == 0) {
     currentTimeout = setTimeout(() => {
       loadAsset(true, fadeTime);
     }, config.interval);
     return;
   }
 
-  // get image path and increase currentImageIndex for next image
+  // get image path and increase currentAssetIndex for next image
   if (isNext) {
-    if (currentImageIndex >= images.length - 1) {
-      currentImageIndex = 0;
+    if (currentAssetIndex >= assets.length - 1) {
+      currentAssetIndex = 0;
     } else {
-      currentImageIndex++;
+      currentAssetIndex++;
     }
   } else {
-    currentImageIndex--;
-    if (currentImageIndex < 0) currentImageIndex = images.length - 1;
+    currentAssetIndex--;
+    if (currentAssetIndex < 0) currentAssetIndex = assets.length - 1;
   }
 
-  var asset = images[currentImageIndex];
+  var asset = assets[currentAssetIndex];
 
   //get current container and create needed elements
   var currentImage = container.firstElementChild;
@@ -241,8 +241,8 @@ function loadAsset(isNext, fadeTime, goToLatest = false) {
   } else if (assetIsImage(asset)) {
     assetTag = document.createElement("img");
   } else if (assetIsText(asset)) {
-    assetTag = document.createElement("div")
-    assetTag.innerText = "Hello World";
+    assetTag = document.createElement("embed")
+    //assetTag.innerText = "Hello World";
   }
   var sender = document.createElement("span");
   var caption = document.createElement("span");
@@ -417,7 +417,7 @@ function loadAsset(isNext, fadeTime, goToLatest = false) {
 
 //notify user of incoming image and restart slideshow with the newest image
 function newAsset(sender, type) {
-  images = remote.getGlobal("images");
+  assets = remote.getGlobal("assets");
   if (type == "image") {
     Swal.fire({
       title: config.newPhotoMessage + " " + sender,
@@ -425,7 +425,7 @@ function newAsset(sender, type) {
       timer: 5000,
       type: "success"
     }).then((value) => {
-      currentImageIndex = images.length;
+      currentAssetIndex = assets.length;
       loadAsset(true, 0);
     });
   } else if (type == "video") {
@@ -435,11 +435,11 @@ function newAsset(sender, type) {
       timer: 5000,
       type: "success"
     }).then((value) => {
-      currentImageIndex = images.length;
+      currentAssetIndex = assets.length;
       loadAsset(true, 0);
     });
   }
 }
 
-//start slideshow of images
+//start slideshow of assets
 loadAsset(true, config.fadeTime);

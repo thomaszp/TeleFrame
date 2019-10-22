@@ -140,8 +140,8 @@ cp config/config.example.js config/config.js
 sed -i "s/\(botToken *: *\).*/\1'$token',/" config/config.js
 
 # Create image directory
-echo -e "\e[96mCreating image directory ...\e[90m"
-mkdir images
+echo -e "\e[96mCreating asset directory ...\e[90m"
+mkdir assets
 
 # Check if plymouth is installed (default with PIXEL desktop environment), then install custom splashscreen.
 echo -e "\e[96mCheck plymouth installation ...\e[0m"

@@ -2,7 +2,7 @@ const { app, BrowserWindow, ipcMain } = require("electron");
 const { logger, rendererLogger } = require("./js/logger");
 const config = require("./config/config");
 const telebot = require("./js/bot");
-const imagewatcher = require("./js/imageWatchdog");
+const assetwatcher = require("./js/assetWatchdog");
 const inputhandler = require("./js/inputHandler");
 const voicerecorder = require("./js/voiceRecorder");
 const schedules = require("./js/schedules");
@@ -10,7 +10,7 @@ const schedules = require("./js/schedules");
 //create global variables
 global.config = config;
 global.rendererLogger = rendererLogger;
-global.images = [];
+global.assets = [];
 
 
 logger.info("Main app started ...");
@@ -37,11 +37,11 @@ function createWindow() {
   // get instance of webContents for sending messages to the frontend
   const emitter = win.webContents;
 
-  // create imageWatchdog and bot
-  var imageWatchdog = new imagewatcher(
+  // create assetWatchdog and bot
+  var assetWatchdog = new assetwatcher(
     config.assetFolder,
-    config.imageCount,
-    global.images,
+    config.assetCount,
+    global.assets,
     emitter,
     logger
   );
@@ -49,7 +49,7 @@ function createWindow() {
   var bot = new telebot(
     config.botToken,
     config.assetFolder,
-    imageWatchdog,
+    assetWatchdog,
     config.showVideos,
     config.whitelistChats,
     config.voiceReply,

@@ -1,32 +1,32 @@
 const fs = require('fs');
 
-var ImageWatchdog = class {
-  constructor(imageFolder, imageCount, images, emitter, logger) {
-    this.imageFolder = imageFolder;
-    this.imageCount = imageCount;
-    this.images = images;
+var AssetWatchdog = class {
+  constructor(assetFolder, assetCount, assets, emitter, logger) {
+    this.assetFolder = assetFolder;
+    this.assetCount = assetCount;
+    this.assets = assets;
     this.logger = logger;
     this.emitter = emitter;
 
-    //get paths of already downloaded images
-    if (fs.existsSync(this.imageFolder + '/' + "assets.json")) {
-      fs.readFile(this.imageFolder + '/' + "assets.json", (err, data) => {
+    //get paths of already downloaded assets
+    if (fs.existsSync(this.assetFolder + '/' + "assets.json")) {
+      fs.readFile(this.assetFolder + '/' + "assets.json", (err, data) => {
         if (err) throw err;
         var jsonData = JSON.parse(data);
-        for (var image in jsonData) {
-          this.images.push(jsonData[image]);
+        for (var asset in jsonData) {
+          this.assets.push(jsonData[asset]);
         }
       });
     } else {
-      this.saveImageArray()
+      this.saveAssetArray()
     }
   }
 
   newAsset(src, sender, caption, chatId, chatName, messageId) {
-    //handle new incoming image
-    // TODO: message ID and chat name to reply to specific image and to show
+    //handle new incoming asset
+    // TODO: message ID and chat name to reply to specific asset and to show
     //         chat name for voice recording message
-    this.images.unshift({
+    this.assets.unshift({
       'src': src,
       'sender': sender,
       'caption': caption,
@@ -34,10 +34,10 @@ var ImageWatchdog = class {
       'chatName': chatName,
       'messageId': messageId
     });
-    if (this.images.length >= this.imageCount) {
-      this.images.pop();
+    if (this.assets.length >= this.assetCount) {
+      this.assets.pop();
     }
-    //notify frontend, that new image arrived
+    //notify frontend, that new asset arrived
 		var type;
 		if (src.split('.').pop() == 'mp4') {
 			type = 'video';
@@ -48,14 +48,14 @@ var ImageWatchdog = class {
       sender: sender,
 			type: type
     });
-    this.saveImageArray();
+    this.saveAssetArray();
   }
 
-  saveImageArray() {
+  saveAssetArray() {
     var self = this;
     // stringify JSON Object
-    var jsonContent = JSON.stringify(this.images);
-    fs.writeFile(this.imageFolder + '/' + "assets.json", jsonContent, 'utf8', function(err) {
+    var jsonContent = JSON.stringify(this.assets);
+    fs.writeFile(this.assetFolder + '/' + "assets.json", jsonContent, 'utf8', function(err) {
       if (err) {
         self.logger.error("An error occured while writing JSON Object to File.");
         return console.log(err);
@@ -67,5 +67,5 @@ var ImageWatchdog = class {
 
 /*************** DO NOT EDIT THE LINE BELOW ***************/
 if (typeof module !== "undefined") {
-  module.exports = ImageWatchdog;
+  module.exports = AssetWatchdog;
 }
