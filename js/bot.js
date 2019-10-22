@@ -60,36 +60,26 @@ var Bot = class {
         return;
       }
 
-      this.logger.info(ctx.message.text);
+      var filename = this.assetFolder + "/" + moment().format("x") + ".txt";
+      fs.writeFile(filename, ctx.message.text, function (err) {
+        if (err) throw err;
+      });
 
-      this.telegram
-          .getFileLink(ctx.message.photo[ctx.message.photo.length - 1].file_id)
-          .then((link) => {
-            download
-                .image({
-                  url: link,
-                  dest: this.assetFolder + "/" + moment().format("x") + ".jpg"
-                })
-                .then(({ filename, image }) => {
-                  var chatName = ''
-                  if (ctx.message.chat.type == 'group') {
-                    chatName = ctx.message.chat.title;
-                  } else if (ctx.message.chat.type == 'private') {
-                    chatName = ctx.message.from.first_name;
-                  }
-                  this.newAsset(
-                      filename,
-                      ctx.message.from.first_name,
-                      ctx.message.caption,
-                      ctx.message.chat.id,
-                      chatName,
-                      ctx.message.message_id
-                  );
-                })
-                .catch((err) => {
-                  this.logger.error(err);
-                });
-          });
+      var chatName = ''
+      if (ctx.message.chat.type == 'group') {
+        chatName = ctx.message.chat.title;
+      } else if (ctx.message.chat.type == 'private') {
+        chatName = ctx.message.from.first_name;
+      }
+      this.newAsset(
+          "text",
+          filename,
+          ctx.message.from.first_name,
+          ctx.message.caption,
+          ctx.message.chat.id,
+          chatName,
+          ctx.message.message_id
+      );
     });
 
     //Download incoming photo
@@ -128,6 +118,7 @@ var Bot = class {
                 chatName = ctx.message.from.first_name;
               }
               this.newAsset(
+                "image",
                 filename,
                 ctx.message.from.first_name,
                 ctx.message.caption,
@@ -177,6 +168,7 @@ var Bot = class {
                 chatName = ctx.message.from.first_name;
               }
               this.newAsset(
+                "video",
                 filename,
                 ctx.message.from.first_name,
                 ctx.message.caption,
@@ -216,9 +208,9 @@ var Bot = class {
     this.logger.info("Bot started!");
   }
 
-  newAsset(src, sender, caption, chatId, chatName, messageId) {
+  newAsset(type, src, sender, caption, chatId, chatName, messageId) {
     //tell assetWatchdog that a new asset arrived
-    this.assetWatchdog.newAsset(src, sender, caption, chatId, chatName, messageId);
+    this.assetWatchdog.newAsset(type, src, sender, caption, chatId, chatName, messageId);
   }
 
   sendMessage(message) {

@@ -22,7 +22,7 @@ var AssetWatchdog = class {
     }
   }
 
-  newAsset(src, sender, caption, chatId, chatName, messageId) {
+  newAsset(type, src, sender, caption, chatId, chatName, messageId) {
     //handle new incoming asset
     // TODO: message ID and chat name to reply to specific asset and to show
     //         chat name for voice recording message
@@ -38,12 +38,6 @@ var AssetWatchdog = class {
       this.assets.pop();
     }
     //notify frontend, that new asset arrived
-		var type;
-		if (src.split('.').pop() == 'mp4') {
-			type = 'video';
-		} else {
-			type = 'image';
-		}
     this.emitter.send('newAsset', {
       sender: sender,
 			type: type
