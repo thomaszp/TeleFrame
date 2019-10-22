@@ -11,6 +11,7 @@ var config = {
   assetCount: 30,
   newPhotoMessage: "Neues Foto von",
   newVideoMessage: "Neues Video von",
+  newTextMessage: "Neue Nachricht von",
   showSender: true,
   showCaption: true,
   toggleMonitor: false,

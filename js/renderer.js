@@ -438,6 +438,16 @@ function newAsset(sender, type) {
       currentAssetIndex = assets.length;
       loadAsset(true, 0);
     });
+  } else if (type == "text") {
+    Swal.fire({
+      title: config.newTextMessage + " " + sender,
+      showConfirmButton: false,
+      timer: 5000,
+      type: "success"
+    }).then((value) => {
+      currentAssetIndex = assets.length;
+      loadAsset(true, 0);
+    });
   }
 }
 
