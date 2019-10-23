@@ -1,6 +1,7 @@
 var ImageContainer = class {
     screenAspectRatio;
     imageAspectRatio;
+
     constructor(asset, div) {
         this.asset = asset;
         this.div = div;
@@ -11,7 +12,7 @@ var ImageContainer = class {
         assetTag.src = this.asset.src;
         assetTag.className = "image";
 
-        assetTag.onload = function() {
+        assetTag.onload = function () {
             this.screenAspectRatio =
                 remote
                     .getCurrentWindow()
