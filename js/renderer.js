@@ -8,6 +8,8 @@ const chroma = require("chroma-js");
 const velocity = require("velocity-animate");
 const logger = remote.getGlobal("rendererLogger");
 const config = remote.getGlobal("config");
+const TextContainer = require("./js/textContainer");
+const ImageContainer = require("./js/imageContainer");
 
 // Inform that Renderer started
 logger.info("Renderer started ...");
@@ -239,10 +241,10 @@ function loadAsset(isNext, fadeTime, goToLatest = false) {
     assetTag.muted = !config.playVideoAudio;
     assetTag.autoplay = true;
   } else if (assetIsImage(asset)) {
-    assetTag = document.createElement("img");
+    //assetTag = document.createElement("img");
+    assetTag = new ImageContainer(asset).createContainer();
   } else if (assetIsText(asset)) {
-    assetTag = document.createElement("embed")
-    //assetTag.innerText = "Hello World";
+    assetTag = new TextContainer(asset).createContainer();
   }
   var sender = document.createElement("span");
   var caption = document.createElement("span");
@@ -270,8 +272,10 @@ function loadAsset(isNext, fadeTime, goToLatest = false) {
   }
 
   //set class names and style attributes
-  assetTag.src = asset.src;
-  assetTag.className = "image";
+  if (!assetIsText(asset) && !assetIsImage(asset)) {
+    assetTag.src = asset.src;
+    assetTag.className = "image";
+  }
   div.className = "assetcontainer";
   sender.className = "sender";
   caption.className = "caption";
@@ -346,7 +350,7 @@ function loadAsset(isNext, fadeTime, goToLatest = false) {
     };
   } else if (assetIsImage(asset)) {
     assetTag.onload = function() {
-      screenAspectRatio =
+      /*screenAspectRatio =
         remote
         .getCurrentWindow()
         .webContents.getOwnerBrowserWindow()
@@ -362,7 +366,8 @@ function loadAsset(isNext, fadeTime, goToLatest = false) {
       } else {
         assetTag.style.height = "100%";
         div.style.height = "100%";
-      }
+      }*/
+      div.style.height = "100%";
       $(div).velocity("fadeIn", {
         duration: fadeTime
       });
@@ -376,7 +381,7 @@ function loadAsset(isNext, fadeTime, goToLatest = false) {
       }
     };
   } else if (assetIsText(asset)) {
-    assetTag.style.width = "100%";
+    //assetTag.style.width = "100%";
     div.style.width = "100%";
     $(div).velocity("fadeIn", {
       duration: fadeTime
@@ -438,7 +443,17 @@ function newAsset(sender, type) {
       currentAssetIndex = assets.length;
       loadAsset(true, 0);
     });
-  } else if (type == "text") {
+    } else if (type == "document") {
+    Swal.fire({
+      title: config.newPhotoMessage + " " + sender,
+      showConfirmButton: false,
+      timer: 5000,
+      type: "success"
+    }).then((value) => {
+      currentAssetIndex = assets.length;
+      loadAsset(true, 0);
+    });
+    } else if (type == "text") {
     Swal.fire({
       title: config.newTextMessage + " " + sender,
       showConfirmButton: false,

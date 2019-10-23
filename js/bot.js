@@ -40,6 +40,57 @@ var Bot = class {
     //Help message
     this.bot.help((ctx) => ctx.reply("Send me an image."));
 
+    //Download incoming document
+    this.bot.on("document", (ctx) => {
+      if (
+          (
+              this.whitelistChats.length > 0 &&
+              this.whitelistChats.indexOf(ctx.message.chat.id) == -1
+          )
+      ) {
+        this.logger.info(
+            "Whitelist triggered:",
+            ctx.message.chat.id,
+            this.whitelistChats,
+            this.whitelistChats.indexOf(ctx.message.chat.id)
+        );
+        ctx.reply(
+            "Hey there, this bot is whitelisted, pls add your chat id to the config file"
+        );
+        return;
+      }
+
+      this.telegram
+          .getFileLink(ctx.message.document.file_id)
+          .then((link) => {
+            download
+                .image({
+                  url: link,
+                  dest: this.assetFolder + "/" + moment().format("x") + ".jpg"
+                })
+                .then(({ filename, image }) => {
+                  var chatName = ''
+                  if (ctx.message.chat.type == 'group') {
+                    chatName = ctx.message.chat.title;
+                  } else if (ctx.message.chat.type == 'private') {
+                    chatName = ctx.message.from.first_name;
+                  }
+                  this.newAsset(
+                      "document",
+                      filename,
+                      ctx.message.from.first_name,
+                      ctx.message.caption,
+                      ctx.message.chat.id,
+                      chatName,
+                      ctx.message.message_id
+                  );
+                })
+                .catch((err) => {
+                  this.logger.error(err);
+                });
+          });
+    });
+
     //Download incoming text messages
     this.bot.on("text", (ctx) => {
       if (
