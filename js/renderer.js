@@ -241,10 +241,9 @@ function loadAsset(isNext, fadeTime, goToLatest = false) {
         assetTag.muted = !config.playVideoAudio;
         assetTag.autoplay = true;
     } else if (assetIsImage(asset)) {
-        //assetTag = document.createElement("img");
-        assetTag = new ImageContainer(asset).createContainer();
+        assetTag = document.createElement("img");
     } else if (assetIsText(asset)) {
-        assetTag = new TextContainer(asset).createContainer();
+        assetTag = document.createElement("embed");
     }
     var sender = document.createElement("span");
     var caption = document.createElement("span");
@@ -272,10 +271,8 @@ function loadAsset(isNext, fadeTime, goToLatest = false) {
     }
 
     //set class names and style attributes
-    if (!assetIsText(asset) && !assetIsImage(asset)) {
-        assetTag.src = asset.src;
-        assetTag.className = "image";
-    }
+    assetTag.src = asset.src;
+    assetTag.className = "image";
     div.className = "assetcontainer";
     sender.className = "sender";
     caption.className = "caption";
@@ -350,7 +347,7 @@ function loadAsset(isNext, fadeTime, goToLatest = false) {
         };
     } else if (assetIsImage(asset)) {
         assetTag.onload = function () {
-            /*screenAspectRatio =
+            screenAspectRatio =
               remote
               .getCurrentWindow()
               .webContents.getOwnerBrowserWindow()
@@ -366,7 +363,7 @@ function loadAsset(isNext, fadeTime, goToLatest = false) {
             } else {
               assetTag.style.height = "100%";
               div.style.height = "100%";
-            }*/
+            }
             div.style.height = "100%";
             $(div).velocity("fadeIn", {
                 duration: fadeTime
