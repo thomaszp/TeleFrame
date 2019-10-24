@@ -8,8 +8,6 @@ const chroma = require("chroma-js");
 const velocity = require("velocity-animate");
 const logger = remote.getGlobal("rendererLogger");
 const config = remote.getGlobal("config");
-const TextContainer = require("./js/textContainer");
-const ImageContainer = require("./js/imageContainer");
 
 // Inform that Renderer started
 logger.info("Renderer started ...");
