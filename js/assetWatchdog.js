@@ -26,6 +26,7 @@ var AssetWatchdog = class {
         //handle new incoming asset
         // TODO: message ID and chat name to reply to specific asset and to show
         //         chat name for voice recording message
+        // put the new asset to beginning of asset array
         this.assets.unshift({
             'src': src,
             'sender': sender,
@@ -34,8 +35,17 @@ var AssetWatchdog = class {
             'chatName': chatName,
             'messageId': messageId
         });
+        // remove last asset from asset array if max. array length is achieved
         if (this.assets.length >= this.assetCount) {
-            this.assets.pop();
+            var assetToRemove = this.assets.pop().src;
+            if (fs.existsSync(assetToRemove)){
+                fs.unlinkSync(assetToRemove, function (err) {
+                    if (err) {
+                        this.logger.error("An error occured while deleting asset file.");
+                        return console.log(err);
+                    }
+                });
+            }
         }
         //notify frontend, that new asset arrived
         this.emitter.send('newAsset', {

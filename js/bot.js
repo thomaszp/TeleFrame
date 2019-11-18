@@ -42,21 +42,8 @@ var Bot = class {
 
         //Download incoming document
         this.bot.on("document", (ctx) => {
-            if (
-                (
-                    this.whitelistChats.length > 0 &&
-                    this.whitelistChats.indexOf(ctx.message.chat.id) == -1
-                )
-            ) {
-                this.logger.info(
-                    "Whitelist triggered:",
-                    ctx.message.chat.id,
-                    this.whitelistChats,
-                    this.whitelistChats.indexOf(ctx.message.chat.id)
-                );
-                ctx.reply(
-                    "Hey there, this bot is whitelisted, pls add your chat id to the config file"
-                );
+            if (this.ifAssetIsNotWhiteListed(ctx))
+            {
                 return;
             }
 
@@ -93,21 +80,8 @@ var Bot = class {
 
         //Download incoming text messages
         this.bot.on("text", (ctx) => {
-            if (
-                (
-                    this.whitelistChats.length > 0 &&
-                    this.whitelistChats.indexOf(ctx.message.chat.id) == -1
-                )
-            ) {
-                this.logger.info(
-                    "Whitelist triggered:",
-                    ctx.message.chat.id,
-                    this.whitelistChats,
-                    this.whitelistChats.indexOf(ctx.message.chat.id)
-                );
-                ctx.reply(
-                    "Hey there, this bot is whitelisted, pls add your chat id to the config file"
-                );
+            if (this.ifAssetIsNotWhiteListed(ctx))
+            {
                 return;
             }
 
@@ -135,21 +109,8 @@ var Bot = class {
 
         //Download incoming photo
         this.bot.on("photo", (ctx) => {
-            if (
-                (
-                    this.whitelistChats.length > 0 &&
-                    this.whitelistChats.indexOf(ctx.message.chat.id) == -1
-                )
-            ) {
-                this.logger.info(
-                    "Whitelist triggered:",
-                    ctx.message.chat.id,
-                    this.whitelistChats,
-                    this.whitelistChats.indexOf(ctx.message.chat.id)
-                );
-                ctx.reply(
-                    "Hey there, this bot is whitelisted, pls add your chat id to the config file"
-                );
+            if (this.ifAssetIsNotWhiteListed(ctx))
+            {
                 return;
             }
 
@@ -186,21 +147,8 @@ var Bot = class {
 
         //Download incoming video
         this.bot.on("video", (ctx) => {
-            if (
-                (
-                    this.whitelistChats.length > 0 &&
-                    this.whitelistChats.indexOf(ctx.message.chat.id) == -1
-                )
-            ) {
-                this.logger.info(
-                    "Whitelist triggered:",
-                    ctx.message.chat.id,
-                    this.whitelistChats,
-                    this.whitelistChats.indexOf(ctx.message.chat.id)
-                );
-                ctx.reply(
-                    "Hey there, this bot is whitelisted, pls add your chat id to the config file"
-                );
+            if (this.ifAssetIsNotWhiteListed(ctx))
+            {
                 return;
             }
 
@@ -293,6 +241,28 @@ var Bot = class {
 
             }.bind(this)
         );
+    }
+
+    ifAssetIsNotWhiteListed(ctx)
+    {
+        if (
+            (
+                this.whitelistChats.length > 0 &&
+                this.whitelistChats.indexOf(ctx.message.chat.id) == -1
+            )
+        ) {
+            this.logger.info(
+                "Whitelist triggered:",
+                ctx.message.chat.id,
+                this.whitelistChats,
+                this.whitelistChats.indexOf(ctx.message.chat.id)
+            );
+            ctx.reply(
+                "Hey there, this bot is whitelisted, pls add your chat id to the config file"
+            );
+            return true;
+        }
+        return false;
     }
 };
 

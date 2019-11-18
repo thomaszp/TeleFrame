@@ -1,7 +1,7 @@
 var config = {
   botToken: "",
   whitelistChats: [],
-  playSoundOnRecieve: "sound1.mp3",
+  playSoundOnReceive: "sound1.mp3",
   showVideos: true,
   playVideoAudio: false,
   assetFolder: "assets",
